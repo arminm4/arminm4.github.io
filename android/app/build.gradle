@@ -1,0 +1,68 @@
+// Trusted Web Activity (TWA) wrapper: a tiny Android app that opens the PWA
+// full-screen in Chrome. The GitHub Actions workflow passes these with -P flags:
+//   -PtwaHost=you.github.io -PtwaPath=/ -PversionCode=12 -PversionName=1.0.12 -PappId=io.github.armolearn.app
+plugins {
+    id 'com.android.application'
+}
+
+def twaHost = (project.findProperty('twaHost') ?: 'example.github.io').toString()
+def twaPath = (project.findProperty('twaPath') ?: '/').toString()
+def appId = (project.findProperty('appId') ?: 'io.github.armolearn.app').toString()
+def launchUrl = "https://${twaHost}${twaPath}".toString()
+
+android {
+    namespace 'io.github.armolearn.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId appId
+        minSdk 21
+        targetSdk 34
+        versionCode((project.findProperty('versionCode') ?: '1').toString().toInteger())
+        versionName((project.findProperty('versionName') ?: '1.0.0').toString())
+
+        manifestPlaceholders = [hostName: twaHost]
+        resValue 'string', 'appName', 'Armo Learn'
+        resValue 'string', 'launcherName', 'Armo Learn'
+        resValue 'string', 'hostName', twaHost
+        resValue 'string', 'launchUrl', launchUrl
+        resValue 'string', 'providerAuthority', "${appId}.fileprovider".toString()
+        // Digital Asset Links statement: this app is allowed to show content from twaHost.
+        resValue 'string', 'assetStatements',
+                '[{ \\"relation\\": [\\"delegate_permission/common.handle_all_urls\\"], ' +
+                '\\"target\\": {\\"namespace\\": \\"web\\", \\"site\\": \\"https://' + twaHost + '\\"}}]'
+    }
+
+    signingConfigs {
+        release {
+            def ks = System.getenv('ANDROID_KEYSTORE_PATH')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword(System.getenv('ANDROID_KEY_PASSWORD') ?: System.getenv('ANDROID_KEYSTORE_PASSWORD'))
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

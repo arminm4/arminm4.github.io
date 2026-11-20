@@ -1,0 +1,79 @@
+# Publishes the PWA to GitHub Pages on every push to main.
+# One-time setup: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+name: Deploy app to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Python libraries used to verify exercise solutions
+        run: pip install numpy pandas scikit-learn
+
+      - name: Cache downloaded Python packages for the in-browser runtime
+        uses: actions/cache@v4
+        with:
+          path: .cache/pyodide-packages
+          key: pyodide-pkgs-${{ hashFiles('package-lock.json') }}
+
+      - name: Install in-browser runtimes (Pyodide, sql.js, numpy/pandas/scikit-learn wheels)
+        run: npm ci
+
+      - name: Validate lessons, quizzes and exercise solutions
+        run: npm run check
+
+      - name: Assemble site
+        run: npm run build
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Digital Asset Links (lets the Android app run full-screen)
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          APP_ID: ${{ vars.ANDROID_APP_ID || 'io.github.armolearn.app' }}
+        run: bash scripts/ci/assetlinks.sh _site/.well-known/assetlinks.json
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

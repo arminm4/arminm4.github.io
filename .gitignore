@@ -1,0 +1,15 @@
+node_modules/
+vendor/
+_site/
+_preview/
+dist/
+signing/
+*.jks
+*.keystore
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+.DS_Store
+Thumbs.db
+.cache/

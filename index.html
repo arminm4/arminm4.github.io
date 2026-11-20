@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Armo Learn</title>
+  <meta name="description" content="Self-paced study app for six bootcamps: Python, Business Intelligence, AI, Agentic AI, Full-Stack AI Engineering and DevOps — with foundations, quizzes, exercises and projects.">
+  <meta name="theme-color" content="#0f1220">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Armo Learn">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    // Apply saved theme before first paint to avoid a flash.
+    try {
+      var s = JSON.parse(localStorage.getItem('armo-learn:v1') || '{}').settings || {};
+      var t = s.theme || 'dark';
+      if (t === 'system') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t;
+      if (s.fontScale) document.documentElement.style.setProperty('--read-scale', s.fontScale);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar" id="topbar">
+    <button class="icon-btn" id="backBtn" aria-label="Back" hidden>
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <a class="brand" href="#/">
+      <img src="icons/icon-192.png" alt="" width="28" height="28">
+      <span>Armo Learn</span>
+    </a>
+    <div class="topbar-title" id="topTitle"></div>
+    <a class="icon-btn" href="#/playground" aria-label="Code playground" title="Code playground">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <div class="read-progress" id="readProgress"></div>
+  </header>
+
+  <main id="view" class="view" tabindex="-1">
+    <div class="boot">
+      <div class="spinner"></div>
+      <p>Loading your bootcamps…</p>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="Main">
+    <a href="#/" data-tab="home">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#/roadmap" data-tab="roadmap">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v16M5 6h11l-2 3 2 3H5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <span>Roadmap</span>
+    </a>
+    <a href="#/review" data-tab="review">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Review</span>
+    </a>
+    <a href="#/search" data-tab="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Search</span>
+    </a>
+    <a href="#/progress" data-tab="progress">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Progress</span>
+    </a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="content/catalog.js"></script>
+  <script src="js/md.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/runners.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
